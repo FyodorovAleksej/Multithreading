@@ -1,0 +1,4 @@
+100
+wood-15
+milk-50
+react-10
