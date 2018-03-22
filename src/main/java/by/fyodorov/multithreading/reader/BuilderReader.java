@@ -10,9 +10,18 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-public class StorageReader {
-    private static final Logger LOGGER = LogManager.getLogger(StorageReader.class);
+/**
+ * class of File Reader
+ */
+public class BuilderReader {
+    private static final Logger LOGGER = LogManager.getLogger(BuilderReader.class);
 
+    /**
+     * read all lines from file
+     * @param path - file path for reading
+     * @return - array of String - lines from file
+     * @throws MultiThreadException - if can't open/read file
+     */
     public String[] readLines(String path) throws MultiThreadException {
         Stream<String> stream = null;
         try {

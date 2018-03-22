@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true" name="C:/Users/Alexey/Documents/GitHub/ConeProject/test/test/fyodorov/coneproject/processing/ConeProcessingTest.java">
+        <classes>
+            <class name="test.fyodorov.multithreading.entity.ShipEntityTest">
+                <methods>
+                    <include name="testControlCheckPositive"/>
+                    <include name="testControlCheckNegative"/>
+                    <include name="testControlCheckOverflowNegative"/>
+                    <include name="testControlGetStoragePositive"/>
+                    <include name="testCountOfOperations"/>
+                </methods>
+            </class>
+            <class name="test.fyodorov.multithreading.reader.AbstractStorageBuilderTest">
+                <methods>
+                    <include name="testBuildPositive"/>
+                    <include name="testBuildNegative"/>
+                </methods>
+            </class>
+            <class name="test.fyodorov.multithreading.storage.PortTest">
+                <methods>
+                    <include name="testFilePort"/>
+                    <include name="testPortSingleton"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

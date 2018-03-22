@@ -2,13 +2,10 @@ package test.fyodorov.multithreading.entity;
 
 import by.fyodorov.multithreading.entity.ShipEntity;
 import by.fyodorov.multithreading.util.ShipOperator;
-import by.fyodorov.multithreading.util.StorageUtil;
+import by.fyodorov.multithreading.entity.StorageEntity;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ShipEntityTest {
     private ShipEntity ship;
@@ -21,8 +18,8 @@ public class ShipEntityTest {
     }
 
     @Test
-    public void testControlCheckPositive() throws Exception {
-        StorageUtil outSide = new StorageUtil(100);
+    public void testControlCheckPositive() {
+        StorageEntity outSide = new StorageEntity(100);
         outSide.addValue("milk", 45);
         outSide.addValue("react",20);
         outSide.addValue("wood",10);
@@ -30,14 +27,14 @@ public class ShipEntityTest {
         ship.addControl("milk", 0);
         ship.addControl("wood", 50);
 
-        ShipOperator operator = ShipOperator.getInstance();
+        ShipOperator operator = new ShipOperator();
 
         Assert.assertTrue(operator.controlCheck(ship, outSide));
     }
 
     @Test
-    public void testControlCheckNegative() throws Exception {
-        StorageUtil outSide = new StorageUtil(100);
+    public void testControlCheckNegative() {
+        StorageEntity outSide = new StorageEntity(100);
         outSide.addValue("milk", 45);
         outSide.addValue("react",20);
         outSide.addValue("wood",10);
@@ -45,14 +42,14 @@ public class ShipEntityTest {
         ship.addControl("milk", 100);
         ship.addControl("react", 20);
 
-        ShipOperator operator = ShipOperator.getInstance();
+        ShipOperator operator = new ShipOperator();
 
         Assert.assertFalse(operator.controlCheck(ship, outSide));
     }
 
     @Test
-    public void testControlCheckOverflowNegative() throws Exception {
-        StorageUtil outSide = new StorageUtil(500);
+    public void testControlCheckOverflowNegative() {
+        StorageEntity outSide = new StorageEntity(500);
         outSide.addValue("milk", 100);
         outSide.addValue("react",40);
         outSide.addValue("wood",10);
@@ -61,14 +58,14 @@ public class ShipEntityTest {
         ship.addControl("react", 40);
         ship.addControl("wood", 40);
 
-        ShipOperator operator = ShipOperator.getInstance();
+        ShipOperator operator = new ShipOperator();
 
         Assert.assertFalse(operator.controlCheck(ship, outSide));
     }
 
     @Test
-    public void testControlGetStoragePositive() throws Exception {
-        StorageUtil outSide = new StorageUtil(500);
+    public void testControlGetStoragePositive() {
+        StorageEntity outSide = new StorageEntity(500);
         outSide.addValue("milk", 45);
         outSide.addValue("react",20);
         outSide.addValue("wood",10);
@@ -76,10 +73,10 @@ public class ShipEntityTest {
         ship.addControl("milk", 10);
         ship.addControl("react", 20);
 
-        ShipOperator operator = ShipOperator.getInstance();
-        operator.controlGetStorage(ship, outSide);
+        ShipOperator operator = new ShipOperator();
+        operator.executeChange(ship, outSide);
 
-        StorageUtil expectedOut = new StorageUtil(500);
+        StorageEntity expectedOut = new StorageEntity(500);
         expectedOut.addValue("milk", 55);
         expectedOut.addValue("react",0);
         expectedOut.addValue("wood",55);
@@ -88,8 +85,8 @@ public class ShipEntityTest {
     }
 
     @Test
-    public void testCountOfOperations() throws Exception {
-        StorageUtil outSide = new StorageUtil(500);
+    public void testCountOfOperations() {
+        StorageEntity outSide = new StorageEntity(500);
         outSide.addValue("milk", 45);
         outSide.addValue("react",20);
         outSide.addValue("wood",10);
@@ -97,8 +94,8 @@ public class ShipEntityTest {
         ship.addControl("milk", 10);
         ship.addControl("react", 20);
 
-        ShipOperator operator = ShipOperator.getInstance();
+        ShipOperator operator = new ShipOperator();
         int expected = 20 + 45 + 10;
-        Assert.assertEquals(operator.countOfOperations(ship, outSide), expected);
+        Assert.assertEquals(operator.countOfOperations(ship), expected);
     }
 }

@@ -1,37 +1,35 @@
 package test.fyodorov.multithreading.reader;
 
-import by.fyodorov.multithreading.reader.AbstractStorageBuilder;
-import by.fyodorov.multithreading.reader.StorageFileBuilder;
-import by.fyodorov.multithreading.util.StorageUtil;
+import by.fyodorov.multithreading.entity.StorageEntity;
+import by.fyodorov.multithreading.exception.MultiThreadException;
+import by.fyodorov.multithreading.storage.AbstractStorageBuilder;
+import by.fyodorov.multithreading.storage.StorageFileBuilder;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
 
 public class AbstractStorageBuilderTest {
     private static final String PATH = "input/storage1.txt";
-
-    @BeforeMethod
-    public void setUp() throws Exception {
-    }
-
-    @AfterMethod
-    public void tearDown() throws Exception {
-    }
+    private static final String FAIL_PATH = "input/st.txt";
 
     @Test
-    public void testBuild() throws Exception {
-        AbstractStorageBuilder builder = new StorageFileBuilder();
-        builder.build(PATH);
-        StorageUtil storage = builder.getResult();
+    public void testBuildPositive() throws Exception {
+        AbstractStorageBuilder builder = new StorageFileBuilder(PATH);
+        builder.build();
+        StorageEntity storage = builder.getResult();
 
-        StorageUtil expected = new StorageUtil(100);
+        StorageEntity expected = new StorageEntity(100);
         expected.addValue("wood", 15);
         expected.addValue("milk", 50);
         expected.addValue("react", 10);
 
         Assert.assertEquals(storage, expected);
+    }
+
+    @Test(expectedExceptions = MultiThreadException.class)
+    public void testBuildNegative() throws Exception {
+        AbstractStorageBuilder builder = new StorageFileBuilder(FAIL_PATH);
+        builder.build();
+        StorageEntity storage = builder.getResult();
+        Assert.fail();
     }
 }

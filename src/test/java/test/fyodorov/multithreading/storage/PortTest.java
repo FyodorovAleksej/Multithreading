@@ -1,67 +1,73 @@
 package test.fyodorov.multithreading.storage;
 
 import by.fyodorov.multithreading.entity.ShipEntity;
-import by.fyodorov.multithreading.storage.PortSingleton;
-import by.fyodorov.multithreading.util.StorageUtil;
+import by.fyodorov.multithreading.entity.StorageEntity;
+import by.fyodorov.multithreading.port.PortBuilderEnum;
+import by.fyodorov.multithreading.port.PortSingleton;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.TimeUnit;
 
 public class PortTest {
-    private static final String PATH = "input/storage1.txt";
+    private static final String PATH = "input/port/portInput1.txt";
+    private PortSingleton port;
+
+    @AfterMethod
+    public void afterMethod() {
+        if (port != null) {
+            port.destroy();
+            PortSingleton.setBuilder(PortBuilderEnum.DEFAULT, null);
+        }
+    }
 
     @Test
-    public void portSingletonTest() throws Exception {
-        PortSingleton port = PortSingleton.getInstance();
-
+    public void testPortSingleton() throws Exception {
+        port = PortSingleton.getInstance();
         port.addProduct("wood", 1000);
         port.addProduct("milk", 1000);
         port.addProduct("react", 1000);
 
-        ShipEntity ship1 = new ShipEntity(200);
-        ship1.addProduct("wood", 20);
-        ship1.addControl("wood", 100);
+        final int ALL = 10;
+        final int START = 4;
 
+        ShipEntity[] ships = new ShipEntity[ALL];
 
-        ShipEntity ship2 = new ShipEntity(200);
-        ship2.addProduct("wood", 20);
-        ship2.addControl("wood", 100);
+        for (int i = 0; i < ALL; i++) {
+            ShipEntity ship = new ShipEntity(200);
+            ship.addProduct("wood", 20);
+            ship.addControl("wood", 100);
+            ships[i] = ship;
+        }
 
-        ShipEntity ship3 = new ShipEntity(200);
-        ship3.addProduct("wood", 20);
-        ship3.addControl("wood", 100);
-
-
-        ShipEntity ship4 = new ShipEntity(200);
-        ship4.addProduct("wood", 20);
-        ship4.addControl("wood", 100);
-
-        ShipEntity ship5 = new ShipEntity(200);
-        ship5.addProduct("wood", 20);
-        ship5.addControl("wood", 100);
-
-
-        ShipEntity ship6 = new ShipEntity(200);
-        ship6.addProduct("wood", 20);
-        ship6.addControl("wood", 100);
-
-        port.service(ship1);
-        port.service(ship2);
-        port.service(ship3);
-        port.service(ship4);
-
+        for (int i = 0; i < START; i++) {
+            port.service(ships[i]);
+        }
         TimeUnit.SECONDS.sleep(10);
 
-        port.service(ship5);
-        port.service(ship6);
+        for (int i = START; i < ALL; i++) {
+            port.service(ships[i]);
+        }
+        TimeUnit.SECONDS.sleep(20);
 
-        TimeUnit.SECONDS.sleep(10);
-
-        StorageUtil expected = new StorageUtil(10000);
+        StorageEntity expected = new StorageEntity(10000);
         expected.addValue("milk", 1000);
-        expected.addValue("wood", 520);
+        expected.addValue("wood", 200);
         expected.addValue("react", 1000);
         Assert.assertEquals(PortSingleton.getInstance().getStorage(), expected);
+    }
+
+    @Test
+    public void testFilePort() throws Exception {
+        PortSingleton.setBuilder(PortBuilderEnum.FILE, PATH);
+        port = PortSingleton.getInstance();
+
+        StorageEntity expected = new StorageEntity(100);
+        expected.addValue("wood", 15);
+        expected.addValue("milk", 50);
+        expected.addValue("react", 10);
+
+        Assert.assertEquals(port.getStorage(), expected);
     }
 }

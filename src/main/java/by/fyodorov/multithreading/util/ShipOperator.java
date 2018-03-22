@@ -1,32 +1,23 @@
 package by.fyodorov.multithreading.util;
 
 import by.fyodorov.multithreading.entity.ShipEntity;
+import by.fyodorov.multithreading.entity.StorageEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * util class of operators between storage.
+ */
 public class ShipOperator {
     private static final Logger LOGGER = LogManager.getLogger(ShipOperator.class);
-    private static ShipOperator instance;
-    private static ReentrantLock lock = new ReentrantLock();
-    private ReentrantLock operationLock;
+    private ReentrantReadWriteLock operationLock;
 
-    private ShipOperator() {
-        operationLock = new ReentrantLock();
-    }
-
-    public static ShipOperator getInstance() {
-        if (instance == null) {
-            lock.lock();
-            if (instance == null) {
-                instance = new ShipOperator();
-            }
-            lock.unlock();
-        }
-        return instance;
+    public ShipOperator() {
+        operationLock = new ReentrantReadWriteLock();
     }
 
     /**
@@ -35,7 +26,10 @@ public class ShipOperator {
      * @return true - if all delays are possible
      *        false - if not all delays are possible
      */
-    public boolean controlCheck(ShipEntity ship, StorageUtil storage) {
+    public boolean controlCheck(ShipEntity ship, StorageEntity storage) {
+        LOGGER.info("control checking");
+
+        operationLock.readLock().lock();
 
         int freeCapacityShip = ship.getBorder() - ship.getCapacity();
         int freeCapacityStorage = storage.getBorder() - storage.getCapacity();
@@ -48,11 +42,13 @@ public class ShipOperator {
             int delta = ship.getProductCount(key) - ship.getControlCount(key);
 
             if (delta < 0 && storage.getCount(key) < -delta) {
+                operationLock.readLock().unlock();
                 return false;
             }
             freeCapacityShip += delta;
             freeCapacityStorage -= delta;
         }
+        operationLock.readLock().unlock();
         return freeCapacityShip >= 0 && freeCapacityStorage >= 0;
     }
 
@@ -60,7 +56,10 @@ public class ShipOperator {
      * method for sending products between 2 storage by 1 control List
      * @param storage - storage, that was putting delays of control Storage
      */
-    public void controlGetStorage(ShipEntity ship, StorageUtil storage) {
+    public void executeChange(ShipEntity ship, StorageEntity storage) {
+        LOGGER.info("execute operation");
+
+        operationLock.writeLock().lock();
         for (String i : ship.getControlKeySet()) {
             Integer count = ship.getProductCount(i);
             Integer control = ship.getControlCount(i);
@@ -77,16 +76,19 @@ public class ShipOperator {
                 ship.addProduct(i, control - count);
             }
         }
+        operationLock.writeLock().unlock();
     }
 
     /**
      * method for getting summary all delays between 2 storage by 1 control List
-     * @param storage - storage, that was putting delays of control Storage
      * @return - sum of all delays, if it possible
      *                          0 - if it impossible
      */
-    public int countOfOperations(ShipEntity ship, StorageUtil storage) {
+    public int countOfOperations(ShipEntity ship) {
+        LOGGER.info("calculate count of operations");
+
         int result = 0;
+        operationLock.readLock().lock();
         for (String i : ship.getControlKeySet()) {
             Integer count = ship.getProductCount(i);
             Integer control = ship.getControlCount(i);
@@ -99,14 +101,7 @@ public class ShipOperator {
                 result += count - control;
             }
         }
+        operationLock.readLock().unlock();
         return result;
-    }
-
-    public void lock() {
-        operationLock.lock();
-    }
-
-    public void unlock() {
-        operationLock.unlock();
     }
 }
