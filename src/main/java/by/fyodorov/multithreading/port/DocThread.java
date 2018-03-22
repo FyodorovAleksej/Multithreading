@@ -12,7 +12,7 @@ import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.TimeUnit;
 
 /**
- * class (Thread) doc of port. Publisher for Port. When become free after job -> notify Port.
+ * class (Thread) doc of port. Publisher for Port. When become free after job - notify Port.
  */
 public class DocThread extends Thread implements Publisher<DocThread> {
     private static final Logger LOGGER = LogManager.getLogger(DocThread.class);

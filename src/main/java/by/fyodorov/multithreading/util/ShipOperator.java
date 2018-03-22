@@ -22,6 +22,7 @@ public class ShipOperator {
 
     /**
      * method for checking allow sending products between 2 storage by 1 control List
+     * @param ship - storage with control list
      * @param storage - storage, that was putting delays of control Storage
      * @return true - if all delays are possible
      *        false - if not all delays are possible
@@ -54,6 +55,7 @@ public class ShipOperator {
 
     /**
      * method for sending products between 2 storage by 1 control List
+     * @param ship - storage with control list
      * @param storage - storage, that was putting delays of control Storage
      */
     public void executeChange(ShipEntity ship, StorageEntity storage) {
@@ -81,8 +83,8 @@ public class ShipOperator {
 
     /**
      * method for getting summary all delays between 2 storage by 1 control List
-     * @return - sum of all delays, if it possible
-     *                          0 - if it impossible
+     * @param ship - storage with control list
+     * @return - sum of all delays
      */
     public int countOfOperations(ShipEntity ship) {
         LOGGER.info("calculate count of operations");
